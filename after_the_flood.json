@@ -1,0 +1,32 @@
+{
+  "id": "after_the_flood",
+  "name": "after_the_flood",
+  "category": "games",
+  "type": "games",
+  "file": "index.html",
+  "urls": [
+    "https://static.seeles.ai/media/3js/89e0739b-5905-4cbb-9b7c-9dff4190e564/index.html"
+  ],
+  "description": "after_the_flood",
+  "tags": [
+    "game",
+    "threejs"
+  ],
+  "keywords": [
+    "game",
+    "threejs"
+  ],
+  "compat": [
+    "threejs"
+  ],
+  "status": "ready",
+  "created_at": "2026-10-19T10:10:37+08:00",
+  "source_date": "2026-10-19",
+  "version": "1.0",
+  "assets_used": [],
+  "canvas_id": "9228071a-cf49-4ee8-9db2-d3b3a9ca311a",
+  "session_canvas_id": "9228071a-cf49-4ee8-9db2-d3b3a9ca311a",
+  "thread_id": "9228071a-cf49-4ee8-9db2-d3b3a9ca311a|652b53b2-944d-4e5c-8e48-49a2880c5d5e",
+  "object_type": "other",
+  "dependencies": []
+}
