@@ -1,0 +1,922 @@
+{
+  "survivor": {
+    "bytes": 5674912,
+    "size": [
+      192.29715722207158,
+      177.99817136451227,
+      38.53185257651767
+    ],
+    "boneCount": 71,
+    "keyHierarchy": [
+      {
+        "name": "mixamorigHips",
+        "parent": "",
+        "position": [
+          0.000003492294354145997,
+          96.36865234375,
+          -0.035689376294612885
+        ]
+      },
+      {
+        "name": "mixamorigSpine",
+        "parent": "mixamorigHips",
+        "position": [
+          0.0008246510829871684,
+          9.22630306412941,
+          1.5771000585880113
+        ]
+      },
+      {
+        "name": "mixamorigSpine1",
+        "parent": "mixamorigSpine",
+        "position": [
+          5.5213334447003215e-16,
+          16.254841369623833,
+          -6.394884621840902e-14
+        ]
+      },
+      {
+        "name": "mixamorigSpine2",
+        "parent": "mixamorigSpine1",
+        "position": [
+          -1.323860107632009e-8,
+          13.700686110951423,
+          -1.7763568394002505e-15
+        ]
+      },
+      {
+        "name": "mixamorigSpine2",
+        "parent": "mixamorigSpine2",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftShoulder",
+        "parent": "mixamorigSpine2",
+        "position": [
+          6.144197761365531,
+          10.85536262446854,
+          -0.5695511623260643
+        ]
+      },
+      {
+        "name": "mixamorigLeftArm",
+        "parent": "mixamorigLeftShoulder",
+        "position": [
+          1.2434497875801753e-14,
+          12.498625397623478,
+          -5.684341886080802e-14
+        ]
+      },
+      {
+        "name": "mixamorigLeftForeArm",
+        "parent": "mixamorigLeftArm",
+        "position": [
+          -1.9118040484045196e-11,
+          27.687000274658146,
+          -5.684341886080802e-14
+        ]
+      },
+      {
+        "name": "mixamorigLeftHand",
+        "parent": "mixamorigLeftForeArm",
+        "position": [
+          -1.9261037209616916e-11,
+          27.873802185058565,
+          1.4495071809506044e-12
+        ]
+      },
+      {
+        "name": "mixamorigLeftUpLeg",
+        "parent": "mixamorigHips",
+        "position": [
+          9.633508595511,
+          -3.274153727700309,
+          -0.00002718009428107765
+        ]
+      },
+      {
+        "name": "mixamorigLeftLeg",
+        "parent": "mixamorigLeftUpLeg",
+        "position": [
+          -1.7763568394002505e-15,
+          41.765849164734924,
+          4.1744385725905886e-14
+        ]
+      },
+      {
+        "name": "mixamorigLeftFoot",
+        "parent": "mixamorigLeftLeg",
+        "position": [
+          8.881784197001252e-15,
+          39.19916513631654,
+          -1.6431300764452317e-14
+        ]
+      }
+    ],
+    "meshes": [
+      {
+        "name": "Soldier_head",
+        "vertices": 24768,
+        "bones": 7,
+        "invalidWeights": 0,
+        "materials": [
+          {
+            "name": "Soldier_body1",
+            "map": true
+          },
+          {
+            "name": "Soldier_head6",
+            "map": true
+          }
+        ]
+      },
+      {
+        "name": "Soldier_body",
+        "vertices": 33582,
+        "bones": 51,
+        "invalidWeights": 0,
+        "materials": [
+          {
+            "name": "Soldier_body1",
+            "map": true
+          }
+        ]
+      }
+    ],
+    "animations": [
+      {
+        "name": "mixamo.com",
+        "duration": 0.03333333507180214,
+        "tracks": 54,
+        "firstTracks": [
+          "mixamorigHips.position",
+          "mixamorigHips.quaternion",
+          "mixamorigSpine.quaternion",
+          "mixamorigSpine1.quaternion",
+          "mixamorigSpine2.quaternion"
+        ]
+      },
+      {
+        "name": "Take 001",
+        "duration": 0,
+        "tracks": 0,
+        "firstTracks": []
+      }
+    ]
+  },
+  "infected": {
+    "bytes": 15897248,
+    "size": [
+      199.28498074539803,
+      206.5763621301842,
+      38.36090719642509
+    ],
+    "boneCount": 189,
+    "keyHierarchy": [
+      {
+        "name": "mixamorigHips",
+        "parent": "",
+        "position": [
+          0.0000013988531009089665,
+          107.58554077148442,
+          -0.2928754091262817
+        ]
+      },
+      {
+        "name": "mixamorigHips",
+        "parent": "mixamorigHips",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigHips",
+        "parent": "mixamorigHips",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigSpine",
+        "parent": "mixamorigHips",
+        "position": [
+          -0.02304569415281193,
+          13.15699771850079,
+          0.9574259548062192
+        ]
+      },
+      {
+        "name": "mixamorigSpine",
+        "parent": "mixamorigSpine",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigSpine",
+        "parent": "mixamorigSpine",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigSpine1",
+        "parent": "mixamorigSpine",
+        "position": [
+          1.734723475976807e-17,
+          9.894913673400566,
+          -5.621150767076699e-10
+        ]
+      },
+      {
+        "name": "mixamorigSpine1",
+        "parent": "mixamorigSpine1",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigSpine1",
+        "parent": "mixamorigSpine1",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigSpine2",
+        "parent": "mixamorigSpine1",
+        "position": [
+          -1.0408340855860843e-17,
+          10.500184059143265,
+          -3.2164382268717873e-10
+        ]
+      },
+      {
+        "name": "mixamorigSpine2",
+        "parent": "mixamorigSpine2",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigSpine2",
+        "parent": "mixamorigSpine2",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftShoulder",
+        "parent": "mixamorigSpine2",
+        "position": [
+          7.980430603027343,
+          21.886375746058377,
+          -6.266447567836275
+        ]
+      },
+      {
+        "name": "mixamorigLeftShoulder",
+        "parent": "mixamorigLeftShoulder",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftShoulder",
+        "parent": "mixamorigLeftShoulder",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftArm",
+        "parent": "mixamorigLeftShoulder",
+        "position": [
+          4.440892098500626e-15,
+          12.001138687133825,
+          3.410605131648481e-13
+        ]
+      },
+      {
+        "name": "mixamorigLeftArm",
+        "parent": "mixamorigLeftArm",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftArm",
+        "parent": "mixamorigLeftArm",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftForeArm",
+        "parent": "mixamorigLeftArm",
+        "position": [
+          -9.552447721716817e-10,
+          27.567787170410103,
+          -1.9895196601282805e-13
+        ]
+      },
+      {
+        "name": "mixamorigLeftForeArm",
+        "parent": "mixamorigLeftForeArm",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftForeArm",
+        "parent": "mixamorigLeftForeArm",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftHand",
+        "parent": "mixamorigLeftForeArm",
+        "position": [
+          6.5933187798350446e-9,
+          27.50427246093752,
+          -4.305888978706207e-11
+        ]
+      },
+      {
+        "name": "mixamorigLeftHand",
+        "parent": "mixamorigLeftHand",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftHand",
+        "parent": "mixamorigLeftHand",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftUpLeg",
+        "parent": "mixamorigHips",
+        "position": [
+          10.12130966715315,
+          -5.316750923393656,
+          0.16304686733204904
+        ]
+      },
+      {
+        "name": "mixamorigLeftUpLeg",
+        "parent": "mixamorigLeftUpLeg",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftUpLeg",
+        "parent": "mixamorigLeftUpLeg",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftLeg",
+        "parent": "mixamorigLeftUpLeg",
+        "position": [
+          -1.0658141036401503e-14,
+          40.855,
+          1.0547118733938987e-14
+        ]
+      },
+      {
+        "name": "mixamorigLeftLeg",
+        "parent": "mixamorigLeftLeg",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftLeg",
+        "parent": "mixamorigLeftLeg",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftFoot",
+        "parent": "mixamorigLeftLeg",
+        "position": [
+          4.1138448914068704e-7,
+          52.1460364708217,
+          8.126832540256146e-14
+        ]
+      },
+      {
+        "name": "mixamorigLeftFoot",
+        "parent": "mixamorigLeftFoot",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftFoot",
+        "parent": "mixamorigLeftFoot",
+        "position": [
+          0,
+          0,
+          0
+        ]
+      }
+    ],
+    "meshes": [
+      {
+        "name": "ZombieGirl_Body",
+        "vertices": 16224,
+        "bones": 63,
+        "invalidWeights": 0,
+        "materials": [
+          {
+            "name": "ZombieGirl_body_Material",
+            "map": true
+          },
+          {
+            "name": "ZombieGirl_Material",
+            "map": true
+          },
+          {
+            "name": "ZombieGirl_Material",
+            "map": true
+          }
+        ]
+      },
+      {
+        "name": "ZombieGirl_Pants",
+        "vertices": 2658,
+        "bones": 63,
+        "invalidWeights": 0,
+        "materials": [
+          {
+            "name": "ZombieGirl_body_Material",
+            "map": true
+          },
+          {
+            "name": "ZombieGirl_Material",
+            "map": true
+          }
+        ]
+      },
+      {
+        "name": "ZombieGirl_Top",
+        "vertices": 3462,
+        "bones": 63,
+        "invalidWeights": 0,
+        "materials": [
+          {
+            "name": "ZombieGirl_body_Material",
+            "map": true
+          },
+          {
+            "name": "ZombieGirl_Material",
+            "map": true
+          }
+        ]
+      }
+    ],
+    "animations": [
+      {
+        "name": "mixamo.com",
+        "duration": 0.03333333507180214,
+        "tracks": 50,
+        "firstTracks": [
+          "mixamorigHips.position",
+          "mixamorigHips.quaternion",
+          "mixamorigSpine.quaternion",
+          "mixamorigSpine1.quaternion",
+          "mixamorigSpine2.quaternion"
+        ]
+      }
+    ]
+  },
+  "idle": {
+    "bytes": 739664,
+    "size": [
+      0,
+      0,
+      0
+    ],
+    "boneCount": 67,
+    "keyHierarchy": [
+      {
+        "name": "mixamorigHips",
+        "parent": "",
+        "position": [
+          0,
+          209.15080582734936,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigSpine",
+        "parent": "mixamorigHips",
+        "position": [
+          -0.1948,
+          19.8048,
+          -3.8897
+        ]
+      },
+      {
+        "name": "mixamorigSpine1",
+        "parent": "mixamorigSpine",
+        "position": [
+          -4.440892098500626e-16,
+          23.620100000000036,
+          3.552713678800501e-15
+        ]
+      },
+      {
+        "name": "mixamorigSpine2",
+        "parent": "mixamorigSpine1",
+        "position": [
+          0,
+          27.833500000000043,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftShoulder",
+        "parent": "mixamorigSpine2",
+        "position": [
+          12.603400000000004,
+          19.313699999999983,
+          0.3592000000000084
+        ]
+      },
+      {
+        "name": "mixamorigLeftArm",
+        "parent": "mixamorigLeftShoulder",
+        "position": [
+          -1.3322676295501878e-15,
+          26.583299999999987,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftForeArm",
+        "parent": "mixamorigLeftArm",
+        "position": [
+          1.7763568394002505e-15,
+          55.12769999999998,
+          -5.684341886080802e-14
+        ]
+      },
+      {
+        "name": "mixamorigLeftHand",
+        "parent": "mixamorigLeftForeArm",
+        "position": [
+          1.7763568394002505e-15,
+          52.77329999999998,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftUpLeg",
+        "parent": "mixamorigHips",
+        "position": [
+          18.5244,
+          -13.83850000000001,
+          2.662
+        ]
+      },
+      {
+        "name": "mixamorigLeftLeg",
+        "parent": "mixamorigLeftUpLeg",
+        "position": [
+          3.552713678800501e-15,
+          85.24560000000001,
+          -4.440892098500626e-16
+        ]
+      },
+      {
+        "name": "mixamorigLeftFoot",
+        "parent": "mixamorigLeftLeg",
+        "position": [
+          7.105427357601002e-15,
+          85.57109999999999,
+          8.881784197001252e-16
+        ]
+      }
+    ],
+    "meshes": [],
+    "animations": [
+      {
+        "name": "mixamo.com",
+        "duration": 7.699999809265137,
+        "tracks": 53,
+        "firstTracks": [
+          "mixamorigHips.position",
+          "mixamorigHips.quaternion",
+          "mixamorigSpine.quaternion",
+          "mixamorigSpine1.quaternion",
+          "mixamorigSpine2.quaternion"
+        ]
+      }
+    ]
+  },
+  "run": {
+    "bytes": 338976,
+    "size": [
+      0,
+      0,
+      0
+    ],
+    "boneCount": 67,
+    "keyHierarchy": [
+      {
+        "name": "mixamorigHips",
+        "parent": "",
+        "position": [
+          0,
+          209.15080582734936,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigSpine",
+        "parent": "mixamorigHips",
+        "position": [
+          -0.1948,
+          19.8048,
+          -3.8897
+        ]
+      },
+      {
+        "name": "mixamorigSpine1",
+        "parent": "mixamorigSpine",
+        "position": [
+          -4.440892098500626e-16,
+          23.620100000000036,
+          3.552713678800501e-15
+        ]
+      },
+      {
+        "name": "mixamorigSpine2",
+        "parent": "mixamorigSpine1",
+        "position": [
+          0,
+          27.833500000000043,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftShoulder",
+        "parent": "mixamorigSpine2",
+        "position": [
+          12.603400000000004,
+          19.313699999999983,
+          0.3592000000000084
+        ]
+      },
+      {
+        "name": "mixamorigLeftArm",
+        "parent": "mixamorigLeftShoulder",
+        "position": [
+          -1.3322676295501878e-15,
+          26.583299999999987,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftForeArm",
+        "parent": "mixamorigLeftArm",
+        "position": [
+          1.7763568394002505e-15,
+          55.12769999999998,
+          -5.684341886080802e-14
+        ]
+      },
+      {
+        "name": "mixamorigLeftHand",
+        "parent": "mixamorigLeftForeArm",
+        "position": [
+          1.7763568394002505e-15,
+          52.77329999999998,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftUpLeg",
+        "parent": "mixamorigHips",
+        "position": [
+          18.5244,
+          -13.83850000000001,
+          2.662
+        ]
+      },
+      {
+        "name": "mixamorigLeftLeg",
+        "parent": "mixamorigLeftUpLeg",
+        "position": [
+          3.552713678800501e-15,
+          85.24560000000001,
+          -4.440892098500626e-16
+        ]
+      },
+      {
+        "name": "mixamorigLeftFoot",
+        "parent": "mixamorigLeftLeg",
+        "position": [
+          7.105427357601002e-15,
+          85.57109999999999,
+          8.881784197001252e-16
+        ]
+      }
+    ],
+    "meshes": [],
+    "animations": [
+      {
+        "name": "mixamo.com",
+        "duration": 0.7333333492279053,
+        "tracks": 53,
+        "firstTracks": [
+          "mixamorigHips.position",
+          "mixamorigHips.quaternion",
+          "mixamorigSpine.quaternion",
+          "mixamorigSpine1.quaternion",
+          "mixamorigSpine2.quaternion"
+        ]
+      }
+    ]
+  },
+  "zombie_walk": {
+    "bytes": 585696,
+    "size": [
+      0,
+      0,
+      0
+    ],
+    "boneCount": 67,
+    "keyHierarchy": [
+      {
+        "name": "mixamorigHips",
+        "parent": "",
+        "position": [
+          0,
+          209.15080582734936,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigSpine",
+        "parent": "mixamorigHips",
+        "position": [
+          -0.1948,
+          19.8048,
+          -3.8897
+        ]
+      },
+      {
+        "name": "mixamorigSpine1",
+        "parent": "mixamorigSpine",
+        "position": [
+          -4.440892098500626e-16,
+          23.620100000000036,
+          3.552713678800501e-15
+        ]
+      },
+      {
+        "name": "mixamorigSpine2",
+        "parent": "mixamorigSpine1",
+        "position": [
+          0,
+          27.833500000000043,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftShoulder",
+        "parent": "mixamorigSpine2",
+        "position": [
+          12.603400000000004,
+          19.313699999999983,
+          0.3592000000000084
+        ]
+      },
+      {
+        "name": "mixamorigLeftArm",
+        "parent": "mixamorigLeftShoulder",
+        "position": [
+          -1.3322676295501878e-15,
+          26.583299999999987,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftForeArm",
+        "parent": "mixamorigLeftArm",
+        "position": [
+          1.7763568394002505e-15,
+          55.12769999999998,
+          -5.684341886080802e-14
+        ]
+      },
+      {
+        "name": "mixamorigLeftHand",
+        "parent": "mixamorigLeftForeArm",
+        "position": [
+          1.7763568394002505e-15,
+          52.77329999999998,
+          0
+        ]
+      },
+      {
+        "name": "mixamorigLeftUpLeg",
+        "parent": "mixamorigHips",
+        "position": [
+          18.5244,
+          -13.83850000000001,
+          2.662
+        ]
+      },
+      {
+        "name": "mixamorigLeftLeg",
+        "parent": "mixamorigLeftUpLeg",
+        "position": [
+          3.552713678800501e-15,
+          85.24560000000001,
+          -4.440892098500626e-16
+        ]
+      },
+      {
+        "name": "mixamorigLeftFoot",
+        "parent": "mixamorigLeftLeg",
+        "position": [
+          7.105427357601002e-15,
+          85.57109999999999,
+          8.881784197001252e-16
+        ]
+      }
+    ],
+    "meshes": [],
+    "animations": [
+      {
+        "name": "mixamo.com",
+        "duration": 4.0333333015441895,
+        "tracks": 53,
+        "firstTracks": [
+          "mixamorigHips.position",
+          "mixamorigHips.quaternion",
+          "mixamorigSpine.quaternion",
+          "mixamorigSpine1.quaternion",
+          "mixamorigSpine2.quaternion"
+        ]
+      }
+    ]
+  }
+}
