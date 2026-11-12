@@ -33,6 +33,7 @@ const saved=restoreFlood(JSON.parse(JSON.stringify(f)));assert.deepEqual(saved.i
 let seq=0,callbacks=new Map(),times=[];
 const loop=createRenderLoop((time,dt)=>times.push(dt),{request:cb=>{callbacks.set(++seq,cb);return seq;},cancel:id=>callbacks.delete(id),now:()=>0});
 loop.start();loop.start();assert.equal(callbacks.size,1);const [id,cb]=[...callbacks][0];callbacks.delete(id);cb(10000);assert.equal(times[0],.05);assert.equal(callbacks.size,1);loop.stop();assert.equal(callbacks.size,0);loop.start();loop.dispose();assert.equal(callbacks.size,0);loop.start();assert.equal(callbacks.size,0);
+let selfStopping;const stoppedFrames=new Map();selfStopping=createRenderLoop(()=>selfStopping.stop(),{request:cb=>{stoppedFrames.set(1,cb);return 1;},cancel:id=>stoppedFrames.delete(id),now:()=>0});selfStopping.start();const stopFrame=stoppedFrames.get(1);stoppedFrames.clear();stopFrame(10);assert.equal(stoppedFrames.size,0);
 let writes=[],cloud=[],statuses=[],resolve;
 const queue=createSaveQueue({writeLocal:d=>writes.push(d),writeCloud:d=>{cloud.push(d);return new Promise(r=>resolve=r);},status:s=>statuses.push(s)});
 assert.equal(queue.save({n:1}),true);queue.save({n:2});queue.save({n:3});assert.equal(writes.length,3);assert.equal(cloud.length,1);resolve(true);await new Promise(r=>setTimeout(r));assert.deepEqual(cloud,[{n:1},{n:3}]);resolve(true);await new Promise(r=>setTimeout(r));assert.equal(statuses.at(-1),'Saved to cloud');

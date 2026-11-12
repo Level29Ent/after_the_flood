@@ -19,7 +19,7 @@ export function createExpedition({scene,getState,getDistrict,getActor,getStamina
     boatMesh=new T.Group();box(boatMesh,0,0,0,1.7,.45,3.6,green);box(boatMesh,0,.35,.3,1.3,.15,1.4,wood);root.add(boatMesh);boatMesh.visible=false;traderMesh=new T.Group();box(traderMesh,0,0,0,1.5,.4,3,gold);box(traderMesh,0,.4,0,1,.5,1.5,wood);root.add(traderMesh);
     const geo=new T.BufferGeometry(),positions=new Float32Array(360);for(let n=0;n<positions.length;n+=3){positions[n]=(Math.random()-.5)*30;positions[n+1]=Math.random()*12;positions[n+2]=Math.random()*100-45;}geo.setAttribute('position',new T.BufferAttribute(positions,3));geometries.add(geo);const mat=new T.PointsMaterial({color:'#c7e7dd',size:.06,transparent:true,opacity:.7});owned.add(mat);rain=new T.Points(geo,mat);root.add(rain);
   }
-  function context(){const p=getActor()?.group.position;const near=type=>p&&points.some(q=>q.type===type&&Math.hypot(p.x-q.x,p.z-q.z)<5);return {camp:near('camp')||layer==='roof',dock:near('dock'),roof:layer==='roof',trader:near('dock')&&s().clock%180<90,district:getDistrict(),tunnel:layer==='tunnel'};}
+  function context(){const p=getActor()?.group.position;const near=type=>p&&points.some(q=>q.type===type&&Math.hypot(p.x-q.x,p.z-q.z)<5);return {camp:near('camp')||layer==='roof'||(s().vessel==='raft'&&s().fleet.raft?.modules>=2),dock:near('dock'),roof:layer==='roof',trader:near('dock')&&s().clock%180<90,district:getDistrict(),tunnel:layer==='tunnel'};}
   function feedback(message){toast(message);save();feedbackUntil=s().clock+1;}
   function distance(p){const a=getActor()?.group.position;return a?Math.hypot(a.x-p.x,a.z-p.z):Infinity;}
   function nearest(){return points.filter(p=>distance(p)<3).sort((a,b)=>distance(a)-distance(b))[0];}
