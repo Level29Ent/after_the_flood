@@ -1,3 +1,4 @@
+import { bindJoystick } from './joystick.js';
 import { restoreFlood } from './flood-systems.js';
 import { createExpedition } from './flood-expedition.js';
 import { createRenderLoop, createAudioController } from './runtime.js';
@@ -14,6 +15,7 @@ import { withinExpansion,siteNames } from './expansion.js';
 
 const controls={sensitivity:1,invert:false,shoulder:1,zoom:4.9,quality:'high',flashlight:false};
 const velocity=new T.Vector2();
+let moveStick={x:0,y:0},lookStick={x:0,y:0};const joysticks=[];
 let insideSite=null;
 
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
@@ -27,7 +29,7 @@ const materials=makeMaterials(),lighting=atmosphere(scene,renderer);const compos
 const muzzleLight=new T.PointLight(0xffc570,0,9,2);scene.add(muzzleLight);
 const torch=new T.SpotLight(0xe5ecdf,28,24,.38,.55,1.3);torch.visible=false;scene.add(torch,torch.target);
 function captureMouse(){if(!document.pointerLockElement){const request=$('#world').requestPointerLock?.();request?.catch(()=>toast('Mouse capture unavailable. Hold right mouse to look.'));}}
-function clearInput(){keys.clear();velocity.set(0,0);mouseDown=false;aiming=false;dragging=false;}
+function clearInput(){for(const stick of joysticks)stick.reset();keys.clear();velocity.set(0,0);mouseDown=false;aiming=false;dragging=false;}
 function colliderBox(c,padding=0){return new T.Box3(new T.Vector3(c.x-c.w/2-padding,c.minY||0,c.z-c.d/2-padding),new T.Vector3(c.x+c.w/2+padding,c.h,c.z+c.d/2+padding));}
 const raycaster=new T.Raycaster(),v1=new T.Vector3(),v2=new T.Vector3();
 const audio=createAudioController();
@@ -190,7 +192,7 @@ function updateHud(){
 }
 function drawMinimap(target){const c=$('#minimap'),x=c.getContext('2d');x.clearRect(0,0,180,180);x.save();x.beginPath();x.arc(90,90,89,0,Math.PI*2);x.clip();x.fillStyle='#20372bc9';x.fillRect(0,0,180,180);x.strokeStyle='#d6d8ac35';x.lineWidth=1;for(let j=0;j<180;j+=30){x.beginPath();x.moveTo(j,0);x.lineTo(j,180);x.moveTo(0,j);x.lineTo(180,j);x.stroke();}const p=actor.group.position,scale=1.8;if(!state.flood.relays.includes(currentDistrict)){x.beginPath();x.arc(90,90,55,0,Math.PI*2);x.clip();}const pos=(xx,z)=>[90+(xx-p.x)*scale,90+(z-p.z)*scale];x.strokeStyle='#e3bc73aa';for(const site of world.sites){const [sx,sz]=pos(site.x-6,site.z-6);x.strokeRect(sx,sz,12*scale,12*scale);}x.fillStyle='#a8b49a35';for(const col of world.colliders){const [xx,yy]=pos(col.x-col.w/2,col.z-col.d/2);x.fillRect(xx,yy,col.w*scale,col.d*scale);}for(const i of world.interact){if(i.used&&i.type==='cache')continue;const [xx,yy]=pos(i.x,i.z);x.fillStyle=i.type==='extract'?'#e4b76e':'#b7cfad';x.fillRect(xx-2,yy-2,4,4);}for(const e of enemies){if(e.hp<=0)continue;const [xx,yy]=pos(e.actor.group.position.x,e.actor.group.position.z);x.fillStyle='#c87858';x.beginPath();x.arc(xx,yy,2.5,0,Math.PI*2);x.fill();}if(target){let [xx,yy]=pos(target.x,target.z);const dx=xx-90,dy=yy-90,l=Math.hypot(dx,dy);if(l>77){xx=90+dx/l*77;yy=90+dy/l*77;}x.strokeStyle='#ecc78c';x.strokeRect(xx-4,yy-4,8,8);}x.translate(90,90);x.rotate(-yaw);x.fillStyle='#efe5c8';x.beginPath();x.moveTo(0,-7);x.lineTo(-4,5);x.lineTo(0,3);x.lineTo(4,5);x.closePath();x.fill();x.restore();}
 function updatePlayer(dt,active){if(!actor)return;let moving=false;
- if(active&&!modalOpen&&!dead){const forward=(keys.has('KeyW')?1:0)-(keys.has('KeyS')?1:0),side=(keys.has('KeyD')?1:0)-(keys.has('KeyA')?1:0);let dx=-Math.sin(yaw)*forward+Math.cos(yaw)*side,dz=-Math.cos(yaw)*forward-Math.sin(yaw)*side;const len=Math.hypot(dx,dz);const sprint=(keys.has('ShiftLeft')||keys.has('ShiftRight'))&&stamina>2&&len>0&&!aiming,dodge=dodgeUntil>elapsed;const speed=(dodge?10:sprint?6.3:aiming?2.1:3.8)*expedition.speed();if(len){dx=dx/len*speed;dz=dz/len*speed;}velocity.lerp(new T.Vector2(dx,dz),1-Math.exp(-dt*(len?13:20)));const before=actor.group.position.clone();move(actor.group,velocity.x*dt,velocity.y*dt);moving=before.distanceToSquared(actor.group.position)>.000001;actor.group.userData.speed=moving?speed:0;if(sprint)stamina=Math.max(0,stamina-dt*survivalBenefits(state.training).sprintDrain);else stamina=Math.min(100,stamina+dt*13);
+ if(active&&!modalOpen&&!dead){yaw-=lookStick.x*dt*2.1;pitch=T.MathUtils.clamp(pitch+lookStick.y*dt*1.3,-.5,.65);const forward=T.MathUtils.clamp((keys.has('KeyW')?1:0)-(keys.has('KeyS')?1:0)-moveStick.y,-1,1),side=T.MathUtils.clamp((keys.has('KeyD')?1:0)-(keys.has('KeyA')?1:0)+moveStick.x,-1,1);let dx=-Math.sin(yaw)*forward+Math.cos(yaw)*side,dz=-Math.cos(yaw)*forward-Math.sin(yaw)*side;const len=Math.hypot(dx,dz);const sprint=(keys.has('ShiftLeft')||keys.has('ShiftRight'))&&stamina>2&&len>0&&!aiming,dodge=dodgeUntil>elapsed;const speed=(dodge?10:sprint?6.3:aiming?2.1:3.8)*expedition.speed();if(len){const magnitude=Math.min(1,len);dx=dx/len*speed*magnitude;dz=dz/len*speed*magnitude;}velocity.lerp(new T.Vector2(dx,dz),1-Math.exp(-dt*(len?13:20)));const before=actor.group.position.clone();move(actor.group,velocity.x*dt,velocity.y*dt);moving=before.distanceToSquared(actor.group.position)>.000001;actor.group.userData.speed=moving?speed:0;if(sprint)stamina=Math.max(0,stamina-dt*survivalBenefits(state.training).sprintDrain);else stamina=Math.min(100,stamina+dt*13);
   const targetRotation=aiming||mouseDown||!len?yaw+Math.PI:Math.atan2(velocity.x,velocity.y);actor.group.rotation.y+=(T.MathUtils.euclideanModulo(targetRotation-actor.group.rotation.y+Math.PI,Math.PI*2)-Math.PI)*(1-Math.exp(-dt*16));
   if(mouseDown)shoot();if(reloadUntil&&elapsed>=reloadUntil){const fill=Math.min(30-state.ammo,state.reserve);state.ammo+=fill;state.reserve-=fill;reloadUntil=0;}
   state.hunger=Math.max(0,state.hunger-dt*.045);if(state.hunger<=0&&elapsed%2<dt)hurt(2);
@@ -231,11 +233,12 @@ listen(window,'pageshow',()=>{if(ready&&!document.hidden)renderLoop.start();});
 listen(document,'visibilitychange',()=>{if(document.hidden){if(ready)save();renderLoop.stop();audio.suspend();}else if(ready)renderLoop.start();});
 // Read-only state supports repeatable gameplay verification without changing progression.
 window.floodStatus=()=>({survival:structuredClone(state.flood),layer:expedition.layer(),ready,running,paused:modalOpen,district:currentDistrict,position:actor?.group.position.toArray(),interior:insideSite?.name||null,sites:world?.sites.map(s=>({name:s.name,x:s.x,z:s.z,entrance:s.entrance,cache:s.cache})),controls:{...controls,yaw,pitch,aiming,velocity:velocity.toArray(),camera:camera.position.toArray()},nearest:nearest()?.id||null,hp:state.hp,ammo:state.ammo,reserve:state.reserve,kills:state.kills,looted:state.looted,missions:[...state.missions],credits:state.credits,medkits:state.medkits,day:state.day,enemies:enemies.map(e=>({id:e.id,hp:e.hp,position:e.actor.group.position.toArray()})),room:{connected:room.connected,code:room.roomCode,isHost:room.isHost,players:Object.keys(room.players).length,remotes:remotes.size},render:{calls:renderer.info.render.calls,triangles:renderer.info.render.triangles}});
+joysticks.push(bindJoystick($('#move-joystick'),{listen,onChange:v=>moveStick=v,enabled:()=>running&&!modalOpen&&!dead}),bindJoystick($('#look-joystick'),{listen,onChange:v=>lookStick=v,enabled:()=>running&&!modalOpen&&!dead}));
 document.querySelectorAll('[data-key]').forEach(button=>{
- listen(button,'pointerdown',e=>{e.preventDefault();button.setPointerCapture(e.pointerId);const code=button.dataset.key;if(code==='KeyE')interact();else if(code==='KeyT')controls.flashlight=!controls.flashlight;else keys.add(code);});
+ listen(button,'pointerdown',e=>{e.preventDefault();button.setPointerCapture(e.pointerId);const code=button.dataset.key;if(!running||modalOpen||dead)return;if(code==='KeyE')interact();else if(code==='KeyR')reload();else if(code==='KeyT')controls.flashlight=!controls.flashlight;else keys.add(code);});
  for(const type of ['pointerup','pointercancel','lostpointercapture'])listen(button,type,()=>keys.delete(button.dataset.key));
 });
-listen($('#touch-fire'),'pointerdown',e=>{e.preventDefault();e.target.setPointerCapture(e.pointerId);mouseDown=true;shoot();});
+listen($('#touch-fire'),'pointerdown',e=>{if(!running||modalOpen||dead)return;e.preventDefault();e.target.setPointerCapture(e.pointerId);mouseDown=true;shoot();});
 for(const type of ['pointerup','pointercancel','lostpointercapture'])listen($('#touch-fire'),type,()=>mouseDown=false);
 let touchLook=null;
 listen($('#world'),'pointerdown',e=>{if(e.pointerType==='touch'&&running&&!modalOpen){touchLook={id:e.pointerId,x:e.clientX,y:e.clientY};e.target.setPointerCapture(e.pointerId);}});

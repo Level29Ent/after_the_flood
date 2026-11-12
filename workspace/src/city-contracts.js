@@ -1,0 +1,14 @@
+export const cityContracts = [
+  {name:'New Orleans · Quarter relief circuit',jobs:[['French Market recovery','Recover preserved rations from the market landing.',-9,28,'search'],['Canal pump restart','Bring 2 copper wire to restart the drainage pump.',9,-14,'repair'],['Cathedral relief convoy','Hold the north relief landing for 30 active seconds.',0,-39,'defend']]},
+  {name:'Houston · Bayou emergency grid',jobs:[['Buffalo Bayou survey','Survey the water gauge and recover engineering supplies.',9,28,'search'],['Downtown grid repair','Spend 2 copper wire restoring the emergency grid.',-9,-14,'repair'],['Mission Control uplink','Hold the emergency uplink for 30 active seconds.',0,-39,'defend']]},
+  {name:'Los Angeles · Coastal evacuation',jobs:[['Sunset archive recovery','Search the evacuation manifest and medical stores.',-9,28,'search'],['Observatory beacon','Spend 2 copper wire reconnecting the hillside beacon.',9,-14,'repair'],['Pacific aid convoy','Hold the convoy rendezvous for 30 active seconds.',0,-39,'defend']]},
+  {name:'Bayou · Blackwater lifeline',jobs:[['Cypress fishing supplies','Recover fishing supplies from the lodge boardwalk.',-20,28,'search'],['Marsh research repeater','Spend 2 copper wire restoring the marsh repeater.',20,-14,'repair'],['Ranger rescue escort','Hold the ranger extraction landing for 30 active seconds.',0,-39,'defend']]}
+];
+export function restoreContracts(value){return Array.from({length:4},(_,i)=>({stage:Number.isInteger(value?.[i]?.stage)?Math.max(0,Math.min(3,value[i].stage)):0,remaining:0}));}
+export function contractAction(state,district){const progress=state.contracts[district],job=cityContracts[district]?.jobs[progress.stage];if(!job)return 'District circuit complete. Explore another district.';if(progress.remaining)return 'Defense underway. Stay within 7 metres of the landing.';
+ if(job[4]==='repair'){if(state.inventory.copper<2)return 'Requires 2 copper wire. Deconstruct abandoned cars with a crowbar.';state.inventory.copper-=2;}
+ if(job[4]==='defend'){progress.remaining=30;return 'Convoy inbound! Hold this landing for 30 active seconds. Leaving resets the countdown.';}
+ return finish(state,district);
+}
+function finish(state,district){const p=state.contracts[district];p.stage++;p.remaining=0;state.inventory.parts+=2;state.inventory.cleanWater+=2;state.inventory.rations+=3;state.inventory.copper+=2;state.morale=Math.min(100,state.morale+6);if(p.stage===3){state.inventory.medicine+=3;state.inventory.fuel+=4;}return `${cityContracts[district].jobs[p.stage-1][0]} complete · +2 parts, +2 water, +3 rations, +2 copper${p.stage===3?' · district bonus: medicine and fuel':''}`;}
+export function tickContract(state,district,dt,distance){const p=state.contracts[district];if(!p.remaining)return null;if(distance>7){p.remaining=30;return null;}p.remaining=Math.max(0,p.remaining-dt);return p.remaining===0?finish(state,district):null;}

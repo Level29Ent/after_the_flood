@@ -1,3 +1,4 @@
+import { restoreContracts } from './city-contracts.js';
 // Serializable, deterministic personal survival simulation. No renderer or browser dependencies.
 export const resources = ['wood','tarps','rope','barrels','rubber','copper','metal','fuel','battery','dirtyWater','cleanWater','charcoal','rations','medicine','parts'];
 export const recipes = {
@@ -35,7 +36,7 @@ const clamp=(n,a=0,b=100)=>Math.max(a,Math.min(b,n));
 const number=(n,f=0,max=100000)=>Number.isFinite(n)?clamp(n,0,max):f;
 export function restoreFlood(saved={}) {
   const s=saved&&typeof saved==='object'?saved:{};
-  return {version:1,inventory:Object.fromEntries(resources.map(k=>[k,number(s.inventory?.[k],({wood:8,tarps:5,rope:4,barrels:4,metal:6,fuel:6,battery:2,cleanWater:4,rations:4,charcoal:3})[k]||0)])),
+  return {version:1,contracts:restoreContracts(s.contracts),inventory:Object.fromEntries(resources.map(k=>[k,number(s.inventory?.[k],({wood:8,tarps:5,rope:4,barrels:4,metal:6,fuel:6,battery:2,cleanWater:4,rations:4,charcoal:3})[k]||0)])),
     gear:Object.fromEntries(Object.keys(recipes).filter(k=>!recipes[k].kind).map(k=>[k,s.gear?.[k]===true])),
     stations:Object.fromEntries(Object.keys(recipes).filter(k=>recipes[k].kind).map(k=>[k,number(s.stations?.[k],0,5)])),
     fleet:Object.fromEntries(Object.keys(boats).map(k=>[k,s.fleet?.[k]?{hull:number(s.fleet[k].hull,100,100),fuel:number(s.fleet[k].fuel,10,30),modules:number(s.fleet[k].modules,0,3)}:null])),
