@@ -1,8 +1,8 @@
 // One owner for animation scheduling. Pause/resume never creates a second chain.
 export function createRenderLoop(render,{request=requestAnimationFrame,cancel=cancelAnimationFrame,now=()=>performance.now()}={}) {
-  let handle=null,previous=0,disposed=false;
-  function frame(time){handle=null;if(disposed)return;const dt=Math.min(Math.max(0,(time-previous)/1000),.05);previous=time;render(time,dt);if(!disposed&&handle===null)handle=request(frame);}
-  return {start(){if(disposed||handle!==null)return;previous=now();handle=request(frame);},stop(){if(handle!==null)cancel(handle);handle=null;},dispose(){disposed=true;this.stop();},get scheduled(){return handle!==null;}};
+  let handle=null,previous=0,disposed=false,running=false;
+  function frame(time){handle=null;if(disposed||!running)return;const dt=Math.min(Math.max(0,(time-previous)/1000),.05);previous=time;render(time,dt);if(!disposed&&running&&handle===null)handle=request(frame);}
+  return {start(){if(disposed||running)return;running=true;previous=now();handle=request(frame);},stop(){running=false;if(handle!==null)cancel(handle);handle=null;},dispose(){disposed=true;this.stop();},get scheduled(){return handle!==null;}};
 }
 export function createAudioController({makeAudio=url=>new Audio(url),makeContext=()=>new (window.AudioContext||window.webkitAudioContext)()}={}) {
   let context=null,ambience=null,shots=[],unlocked=false,enabled=true,index=0;
