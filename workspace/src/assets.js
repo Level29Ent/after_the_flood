@@ -76,6 +76,31 @@ function observatory(p,m){const g=new T.Group();g.position.set(0,0,-56);p.add(g)
 function rocket(p,m){const g=new T.Group();g.position.set(0,0,-72);p.add(g);cyl(g,m.white,0,12,0,1.4,24);cyl(g,m.dark,0,7,0,1.43,2);cyl(g,m.dark,0,19,0,1.42,.9);mesh(new T.ConeGeometry(1.4,5,32),m.white,g,0,26.5,0);for(const a of [-1,1]){const f=box(g,m.white,a*2,2,0,1.3,4,.25);f.rotation.z=-a*.25;}for(let j=0;j<3;j++)cyl(g,m.rust,(j-1)*.8,.5,0,.4,1);const s=sign(g,'UNITED STATES',0,13,1.43,1.3,8);sign(p,'SPACE CENTER HOUSTON',-22,2,-21,13,1.1);}
 function mergeStatic(root){root.updateMatrixWorld(true);const groups=new Map(),remove=[];root.traverse(o=>{if(o.isMesh&&!Array.isArray(o.material)&&!o.userData.dynamic){const key=o.material.uuid;if(!groups.has(key))groups.set(key,{material:o.material,geos:[]});const geo=o.geometry.clone();geo.applyMatrix4(o.matrixWorld);if(geo.index)groups.get(key).geos.push(geo.toNonIndexed());else groups.get(key).geos.push(geo);remove.push(o);}});for(const o of remove)o.removeFromParent();for(const {material,geos} of groups.values()){const g=mergeGeometries(geos);if(g){const mm=new T.Mesh(g,material);mm.castShadow=mm.receiveShadow=true;root.add(mm);}for(const gg of geos)gg.dispose();}}
 
+// Beyond the walkable streets: finished skyline, embankments and side-route frontage.
+// These silhouettes stay outside the established collision/navigation envelope.
+function finishDistrictEdges(root,m,index){
+ if(index===3){
+  for(const side of [-1,1]){box(root,m.trunk,side*77,-.1,-5,10,.8,180);for(let z=-76;z<78;z+=16)cypress(root,m,side*(67+rand()*4),z,.9+rand()*.3);}
+  return;
+ }
+ for(const side of [-1,1]){
+  for(let i=0;i<7;i++){
+   const x=side*(59+(i%2)*12),z=-65+i*22,w=12+rand()*7,h=index===1?24+rand()*28:7+rand()*10;
+   box(root,index===1?m.metal:[m.wall,m.brick,m.green][i%3],x,h/2,z,w,h,18);
+   box(root,m.dark,x,h+.18,z,w+.5,.35,18.5);
+   for(let y=2;y<h-1;y+=3.5)for(let zz=-6;zz<=6;zz+=3){box(root,m.glass,x-side*(w/2+.02),y,z+zz,.06,1.8,1.2);box(root,m.stone,x-side*(w/2+.1),y-1,z+zz,.2,.12,1.5);}
+   box(root,m.stone,x,1,z,w+.2,2,18.2);
+  }
+  for(const z of crossings){
+   // Backdrop gateways frame each side street without sealing the route.
+   for(const edge of [-1,1]){box(root,m.stone,side*49,.3,z+edge*8,9,.6,1);for(let n=0;n<5;n++)box(root,m.metal,side*(45+n*2),1,z+edge*8,.08,1.4,.08);box(root,m.metal,side*49,1.7,z+edge*8,9,.08,.08);}
+  }
+ }
+ for(const z of [-86,78]){box(root,m.stone,0,.5,z,168,1,2);box(root,m.metal,0,1.15,z,168,.15,1);}
+ // Drain covers, water marks and utility details anchor the flooded street to the buildings.
+ for(let z=-39;z<47;z+=14)for(const side of [-1,1]){box(root,m.metal,side*8.1,.1,z,.55,.08,1.1);for(let n=0;n<5;n++)box(root,m.dark,side*8.1,.145,z-.4+n*.2,.45,.015,.06);}
+}
+
 export function buildDistrict(index,m) {
  seed=18371+index*171;const root=new T.Group(),colliders=[],waters=[];root.name=`district-${index}`;
  box(root,index===3?m.trunk:m.road,0,-.25,0,170,.5,190);
@@ -106,6 +131,7 @@ export function buildDistrict(index,m) {
  const station=new T.Group();const stationX=index===3?2:6;station.position.set(stationX,0,43);root.add(station);box(station,m.wood,0,.7,0,2.5,1.4,1);box(station,m.metal,0,1.45,0,2.7,.12,1.2);sign(station,'RELIEF / WORKBENCH',0,1.9,.52,3.2,.45);box(station,m.red,-.75,1.65,0,.4,.35,.3);box(station,m.metal,.6,1.65,0,.6,.35,.4);
  const expansion=prepareExpansion(index,m);root.add(expansion.root);colliders.push(...expansion.colliders);
  for(const z of crossings){sign(root,index===3?'LODGE ← / BOATHOUSE →':'LOCAL SUPPLIES ← / RELIEF →',0,5.4,z,8,.6);for(const x of [-10,10])if(index!==3)lamp(root,m,x,z+6);}
+ finishDistrictEdges(root,m,index);
  mergeStatic(root);
  const interact=[];
  const createCache=(id,x,z,type='cache')=>{
