@@ -34,3 +34,8 @@ Approved Three.js publisher succeeded, uploaded 12 build files and synchronized 
 - Changed source: src/expansion.js (new), src/assets.js, src/main.js, src/style.css, index.html. Added repeatable test_expansion.mjs and test_world.mjs; design/asset/verification records updated. No unrelated services changes.
 
 Expansion publication: approved Three.js publisher succeeded with 12 files, frontend Preview synchronized. Published entry https://static.seeles.ai/media/3js/89e0739b-5905-4cbb-9b7c-9dff4190e564/index.html opened successfully; ready=true, four expansion sites present, no browser errors or console errors. Owned browser session closed.
+
+## Survival training revision
+Recovered missing main.js, expansion.js, services.js and style.css from this repository's own Git objects (not reconstructed from the minified bundle). Corrected the HTML entry to src/main.js and restored character/audio source assets from the checked-in distribution. No service credentials or endpoints were changed.
+
+Added permanent personal armor, scavenging and endurance training (three levels each) to the relief workbench. Old saves default to no training. Purchase guards and benefit calculations checked by `node test_survival.mjs`; all sixteen room/caches remain reachable in `test_expansion.mjs` and `test_world.mjs`. `npm ci`, syntax check and Vite production build passed. Existing large-bundle warning remains; npm reports one moderate dependency advisory (not automatically upgraded during source recovery). Preview checks pending.
