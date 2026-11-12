@@ -25,3 +25,11 @@ These are small-scale simulation and interaction mechanics, not new full-sized H
 
 ## Checks
 `node test_flood.mjs`, `node test_survival.mjs`, `node test_expansion.mjs`, `node test_world.mjs`, and `npm run build`.
+
+## Environment completion revision
+- Replaced the floating tower slabs with foundations, side/rear walls, windows, three connected stair flights, landings, parapets, relay hardware and salvage furniture. The front remains a deliberate third-person camera cutaway. Floor changes still use the existing interact/console flow.
+- Underground is a separate visible layer with a closed tunnel shell, structural ribs, track sleepers, floodwater, signs and lighting. Surface geometry is hidden underground; camera bounds and player elevation use the active layer. Surface return, respawn and menu reset the layer.
+- Constructed collectors, solar panels, medical tents, barricades, generators, batteries, filters, fridges, crops and fires appear at the relief deck and rooftop when built or loaded from a save. Stations rebuild only when their levels change; replaced geometry/textures are released.
+- Docks now have planks, piles and mooring rails. Skiffs, fan-cage airboats, cabin patrol boats and barrel rafts have distinct geometry; chest/fire/passenger-platform modules are visible.
+- Site cubes are replaced by labeled salvage, vehicles, wreckage, runoff barrels and hazard props. City-edge skyline, street gateways, drains and Bayou embankment planting fill the previously exposed map edges without changing the established walkable envelope.
+- `node test_environment.mjs` verifies geometry, station visibility, boat variants, tunnel/surface switching, all floor heights, deck bounds and teardown in every district. Existing path-reachability checks remain unchanged and pass. This remains a procedural environment, not a photorealistic or full-city asset pack.
