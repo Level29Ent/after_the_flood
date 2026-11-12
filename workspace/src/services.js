@@ -1,3 +1,4 @@
+import { createSaveQueue } from './runtime.js';
 import { createClient } from '@supabase/supabase-js';
 export const backend=createClient('https://wlrdtgttnidaqviujsyz.supabase.co','sb_publishable_quLfjK1EgrPmRGFCoavQow_G_nQ721t',{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:25}}});
 let identity=null;
@@ -11,14 +12,18 @@ export async function initStorage(status){
 }
 export async function loadSave(){
  let cached=null;
- try{cached=JSON.parse(localStorage.getItem(localKey)||'null');}catch{storageStatus('Local save could not be read');}
+ try{cached=JSON.parse(localStorage.getItem(localKey)||'null');}catch{try{cached=JSON.parse(localStorage.getItem(`${localKey}:backup`)||'null');storageStatus('Recovered backup save');}catch{storageStatus('Local save could not be read');}}
  if(identity){try{const {data,error}=await backend.from('game_user_data').select('game_data,schema_version,updated_at').eq('platform_user_id',identity.platformUserId).eq('game_id',identity.storageGameId).eq('data_key','default').maybeSingle();if(error)throw error;if(data&&data.schema_version===1&&(!cached||new Date(data.updated_at).getTime()>(cached.savedAt||0)))return data.game_data;}catch{storageStatus('Cloud unavailable · using local save');}}
  return cached?.schema_version===1?cached.game_data:null;
 }
-export async function saveProgress(data){
- try{localStorage.setItem(localKey,JSON.stringify({schema_version:1,savedAt:Date.now(),game_data:data}));}catch{storageStatus('Local save unavailable · storage is full');return false;}
- if(!identity){storageStatus('Progress saved locally');return true;}
- try{const {error}=await backend.from('game_user_data').upsert({platform_user_id:identity.platformUserId,game_id:identity.storageGameId,data_key:'default',game_data:data,schema_version:1},{onConflict:'platform_user_id,game_id,data_key'});if(error)throw error;storageStatus('Progress saved to cloud');return true;}catch{storageStatus('Saved locally · cloud retry pending');return false;}
+let saveQueue=null;
+export function saveProgress(data){
+ if(!saveQueue)saveQueue=createSaveQueue({
+  status:message=>storageStatus(message),
+  writeLocal:value=>{const payload=JSON.stringify({schema_version:1,savedAt:Date.now(),game_data:value});localStorage.setItem(localKey,payload);try{localStorage.setItem(`${localKey}:backup`,payload);}catch{/* Primary write succeeded; backup is best effort. */}},
+  writeCloud:identity?async value=>{const {error}=await backend.from('game_user_data').upsert({platform_user_id:identity.platformUserId,game_id:identity.storageGameId,data_key:'default',game_data:value,schema_version:1},{onConflict:'platform_user_id,game_id,data_key'});return !error;}:null
+ });
+ return saveQueue.save(data);
 }
 export class CooperativeRoom{
  constructor(handlers){this.handlers=handlers;this.id=crypto.randomUUID();this.joinedAt=Date.now();this.hostId=this.id;this.players={};this.connected=false;this.roomCode='';this.channel=null;this.lastWorld=0;}
