@@ -62,3 +62,13 @@ Validation: `npm test` and `npm run build`. The new suite exercises rescue and c
 - Fieldcraft supplies, lures, healing and surveys are solo-only. Host-authoritative enemy cover checks also apply in co-op, but no new multiplayer fieldcraft protocol is introduced. No dependencies or external assets were added.
 
 Checks: `npm test` now includes the fieldcraft suite alongside all seven existing suites. It covers save migration, costs/pack limits, treatment and failed-action guards, unique rewards and archive visibility, all 12 real-geometry survey destinations, cover and lure perception priorities, blocked throwing, lure lifetime/pause/co-op guards, and geometry/material teardown. These are automated simulations, not a claim that the latest UI or combat balance has been browser-playtested.
+
+
+# Stability corrections
+
+- Fatal environmental/climb damage now enters the death screen directly, even during combat invulnerability. Death penalties are idempotent, death controls cannot be replaced by a field-kit panel, and a living player cannot invoke respawn to heal. Reload/dodge state is cleared on respawn and district/multiplayer transitions.
+- Solo combat timers pause with the simulation, so menus no longer expire invulnerability, reload or enemy hearing timers. Bottle noise memory no longer inherits the ten-second gunfire memory.
+- Street interactions, salvage and hazards no longer operate from rooftops/tunnels; returning from an elevated/underground layer places the actor at its surface exit. Players must moor before climbing or entering transit. Personal anchored/disabled vessels no longer block co-op movement, and joining co-op resets the solo layer.
+- Save loading normalizes top-level resources, district, arrays and position before renderer use, rejects inherited weapon/vessel lookup names, tolerates malformed survivor entries, and tries a valid backup when the primary payload is invalid (not only malformed JSON). Existing valid progress is retained.
+- Vite is patched within the existing version range to 6.4.6; `npm audit` reports zero vulnerabilities for the resulting lockfile. The build separates Three.js core/addons and multiplayer dependencies rather than raising the warning threshold; no output chunk exceeds the configured 800KB limit.
+- `npm test` includes a ninth stability suite exercising the actual death/respawn functions, corrupt-save/backup cases, rooftop/tunnel isolation, co-op speed and fatal environment/climb behavior across all districts. Browser verification is recorded on the PR separately and remains necessary for rendered layout and real-input gameplay.
