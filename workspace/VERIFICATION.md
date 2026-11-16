@@ -4,7 +4,7 @@
 - `npm run build`: passed, final production output in `dist/`. Non-blocking Vite warning: main JS bundle exceeds 800KB (about 247KB gzip).
 - `node --check src/main.js`, `node --check src/assets.js`, `node --check src/services.js`: passed.
 - `node .../game-data-storage/scripts/validate_storage_integration.mjs .`: passed.
-- Actual production build opened under `/dist/`, not the site root. Models, animations, audio, JS and CSS loaded from local relative paths. Embedded FBX textures use local blob URLs. No external game asset hotlinks.
+- Actual production build opened under `/dist/`, not the site root. Models, animations, audio, JS and CSS loaded from local relative paths. Embedded FBX textures use local blob URLs. No external game asset hotlinks. 
 - Browser gameplay: deployed, aimed with mouse motion, fired carbine, killed infected (kill count 0→1, XP/scrap earned), used WASD movement, searched relief cache (loot 0→1, reserve 120→144), opened journal, returned to beacon and received extraction result.
 - Daily reward: rounds +60, medkits 3→5, credits +50; claim button disabled after claim. Reload restored kill count, supply count and credits (55 after extraction), equipment and position.
 - Two real game tabs joined the same online room. Earliest client elected leader, second client showed one peer and one remote avatar. Host enemy snapshot synchronized to late joiner. Host district travel to swamp synchronized district 3 on follower. Leader recovery observed after original host disconnected.
