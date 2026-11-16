@@ -7,7 +7,7 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "node test_living.mjs && node test_controls_cities.mjs && node test_flood.mjs && node test_survival.mjs && node test_expansion.mjs && node test_world.mjs && node test_environment.mjs"
+    "test": "node test_fieldcraft.mjs && node test_living.mjs && node test_controls_cities.mjs && node test_flood.mjs && node test_survival.mjs && node test_expansion.mjs && node test_world.mjs && node test_environment.mjs"
   },
   "dependencies": {
     "three": "^0.180.0",

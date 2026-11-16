@@ -19,3 +19,9 @@
 .dispatch-status{display:flex;gap:20px;justify-content:space-between;padding:14px;border-block:1px solid #8a9c7a55;color:#e8aa50;font-variant-numeric:tabular-nums}
 .loadout-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}.loadout-card{padding:18px;border:1px solid #8a9c7a55}.loadout-card.selected{border-color:#e8aa50}.loadout-card p{font-size:14px;line-height:1.6;min-height:48px}.loadout-card button{margin:4px 4px 0 0}.loadout-card small{color:#e8aa50;letter-spacing:.12em}.briefing-list{padding-left:24px;line-height:1.7}.briefing-list li{padding:6px 0}.modal-panel .panel-footer{flex-wrap:wrap}
 @media(max-width:760px){.dispatch-tracker{top:175px;left:12px;max-width:210px;padding:7px;font-size:11px}.loadout-grid{grid-template-columns:1fr}.dispatch-status{flex-wrap:wrap;gap:6px}#living-prompt{bottom:210px;font-size:12px}.touch-actions{max-width:235px}#save-dock{max-width:95vw;flex-wrap:wrap}}
+
+/* Fieldcraft keeps action prompts clear of the crosshair. */
+#fieldcraft-status{position:absolute;right:4.2%;top:280px;max-width:255px;padding:8px 12px;background:#111713dc;color:#c7d1bc;font:11px/1.6 system-ui;pointer-events:none}
+#fieldcraft-prompt{position:absolute;bottom:215px;left:50%;transform:translateX(-50%);max-width:85vw;padding:9px 14px;border:1px solid #8a9c7a;background:#111713ed;color:#e6e1cd;font-size:13px;pointer-events:none}
+.field-record{padding:10px 16px;border-left:2px solid #8a9c7a;margin:14px 0;background:#11171366}.field-record p{font-size:14px;line-height:1.7;color:#d1d4c2}
+@media(max-width:760px){#fieldcraft-status{left:auto;right:12px;top:195px;max-width:46vw;padding:5px 7px;font-size:10px}#fieldcraft-prompt{bottom:250px;font-size:11px}.touch-actions{max-width:240px}}
