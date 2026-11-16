@@ -141,7 +141,7 @@ export function restoreLiving(saved = {}) {
   const s = saved && typeof saved === "object" ? saved : {};
   return {
     version: 1,
-    selected: WEAPONS[s.selected] ? s.selected : "carbine",
+    selected: Object.hasOwn(WEAPONS,s.selected) ? s.selected : "carbine",
     onboarded: s.onboarded === true,
     ammo: {
       crossbow: {

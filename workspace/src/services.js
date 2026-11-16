@@ -1,3 +1,4 @@
+import { readLocalSave } from './save-state.js';
 import { createSaveQueue } from './runtime.js';
 import { createClient } from '@supabase/supabase-js';
 export const backend=createClient('https://wlrdtgttnidaqviujsyz.supabase.co','sb_publishable_quLfjK1EgrPmRGFCoavQow_G_nQ721t',{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false},realtime:{params:{eventsPerSecond:25}}});
@@ -11,9 +12,8 @@ export async function initStorage(status){
  catch{status('Local save · cloud identity unavailable');}
 }
 export async function loadSave(){
- let cached=null;
- try{cached=JSON.parse(localStorage.getItem(localKey)||'null');}catch{try{cached=JSON.parse(localStorage.getItem(`${localKey}:backup`)||'null');storageStatus('Recovered backup save');}catch{storageStatus('Local save could not be read');}}
- if(identity){try{const {data,error}=await backend.from('game_user_data').select('game_data,schema_version,updated_at').eq('platform_user_id',identity.platformUserId).eq('game_id',identity.storageGameId).eq('data_key','default').maybeSingle();if(error)throw error;if(data&&data.schema_version===1&&(!cached||(data.game_data?.savedAt||new Date(data.updated_at).getTime())>(cached.savedAt||0)))return data.game_data;}catch{storageStatus('Cloud unavailable · using local save');}}
+ let cached=null;try{cached=readLocalSave(localStorage,localKey,storageStatus);}catch{storageStatus('Local save could not be read');}
+ if(identity){try{const {data,error}=await backend.from('game_user_data').select('game_data,schema_version,updated_at').eq('platform_user_id',identity.platformUserId).eq('game_id',identity.storageGameId).eq('data_key','default').maybeSingle();if(error)throw error;if(data&&data.schema_version===1&&data.game_data?.version===1&&!Array.isArray(data.game_data)&&(!cached||(data.game_data?.savedAt||new Date(data.updated_at).getTime())>(cached.savedAt||0)))return data.game_data;}catch{storageStatus('Cloud unavailable · using local save');}}
  return cached?.schema_version===1?cached.game_data:null;
 }
 let saveQueue=null;

@@ -4,14 +4,14 @@ import * as T from 'three';
 import {resources,recipes,boats,craftFlood,buildBoat,actionFlood,loot,recruit,tickFlood,weight,logEvent} from './flood-systems.js';
 const escape=text=>String(text).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const names={camp:'High-ground relief camp',dock:'Mooring pier / wandering trader',roof:'Hotel / office tower stairwell',tunnel:'Storm drain / flooded transit',store:'Flooded storefront',attic:'Sealed attic · toxic mold',crate:'Drifting supply crate',car:'Abandoned car · crowbar salvage',wreck:'Debris fortifications · axe salvage',debris:'Drifting wreckage · hook / net salvage',survivor:'Rooftop distress signal',looter:'Looters guarding a supply cache',zoo:'Flooded zoo / aquarium perimeter',chemical:'Industrial chemical runoff',wire:'Downed live power line',brush:'Cottonmouths / mosquito swarm',drop:'Relay supply drop'};
-export function createExpedition({scene,getState,getDistrict,getActor,getStamina,setStamina,hurt,move,openModal,closeModal,toast,save,isActive,canUse}) {
+export function createExpedition({scene,getState,getDistrict,getActor,getStamina,setStamina,hurt,move,openModal,closeModal,toast,save,isActive,canUse,onDeath=()=>hurt(1)}) {
   let root=null,water=null,boatMesh=null,rain=null,points=[],layer='street',point=null,lastEvent=-10,hitCooldown=0,feedbackUntil=0,collisionAt=-10,floor=1,roofOrigin=null,traderMesh=null,models=null,surfaceRoot=null,tunnelRoot=null,tower=null,campRoot=null,stationRoot=null,roofStations=null,stationSignature='',boatSignature='';
   const owned=new Set(),geometries=new Set();
   const s=()=>getState().flood;
   function material(color,extra={}){const m=new T.MeshStandardMaterial({color,roughness:.75,...extra});owned.add(m);return m;}
   function box(parent,x,y,z,w,h,d,mat){const geo=new T.BoxGeometry(w,h,d);geometries.add(geo);const o=new T.Mesh(geo,mat);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;}
   function dispose(){if(root)scene.remove(root);for(const g of geometries)g.dispose();for(const m of owned){m.map?.dispose();m.dispose();}geometries.clear();owned.clear();root=null;stationSignature='';boatSignature='';}
-  function rebuild(){dispose();layer='street';floor=1;roofOrigin=null;point=null;root=new T.Group();scene.add(root);models=createEnvironmentModels({box,material,geometry:g=>geometries.add(g)});surfaceRoot=models.group(root,'surface-environment');tunnelRoot=models.tunnel(root);tunnelRoot.visible=false;const wood=material('#77694b'),gold=material('#e0ae58'),green=material('#527368'),danger=material('#bd6249');
+  function rebuild(){dispose();lastEvent=-10;hitCooldown=0;collisionAt=-10;feedbackUntil=0;layer='street';floor=1;roofOrigin=null;point=null;root=new T.Group();scene.add(root);models=createEnvironmentModels({box,material,geometry:g=>geometries.add(g)});surfaceRoot=models.group(root,'surface-environment');tunnelRoot=models.tunnel(root);tunnelRoot.visible=false;const wood=material('#77694b'),gold=material('#e0ae58'),green=material('#527368'),danger=material('#bd6249');
     water=box(surfaceRoot,0,.1,0,getDistrict()===3?70:26,.04,101,material('#315c58',{transparent:true,opacity:.42,metalness:.6,roughness:.16}));
     points=[['camp',0,43],['dock',4,36],['roof',-5,27],['tunnel',5,27],['store',-5,12],['attic',5,4],['crate',-4,-5],['car',5,18],['wreck',-5,-13],['debris',4,-22],['survivor',-5,-32],['looter',5,-35],['zoo',-5,-41],['chemical',4,-9],['wire',-4,-18],['brush',5,-27],['drop',0,-44]].map(([type,x,z])=>({type,x:getDistrict()===3?x*.35:x,z,id:`${getDistrict()}:${type}`}));
     for(const [n,job] of cityContracts[getDistrict()].jobs.entries())points.push({type:'contract',x:job[2],z:job[3],id:`contract:${getDistrict()}:${n}`,stage:n,title:job[0]});
@@ -34,14 +34,14 @@ export function createExpedition({scene,getState,getDistrict,getActor,getStamina
     boatMesh=models.group(surfaceRoot,'active-vessel');boatMesh.visible=false;traderMesh=models.boat(surfaceRoot,'patrol');models.label(traderMesh,'BARTER / NO CURRENCY',0,1.4,.8,2);
     const geo=new T.BufferGeometry(),positions=new Float32Array(360);for(let n=0;n<positions.length;n+=3){positions[n]=(Math.random()-.5)*30;positions[n+1]=Math.random()*12;positions[n+2]=Math.random()*100-45;}geo.setAttribute('position',new T.BufferAttribute(positions,3));geometries.add(geo);const mat=new T.PointsMaterial({color:'#c7e7dd',size:.06,transparent:true,opacity:.7});owned.add(mat);rain=new T.Points(geo,mat);root.add(rain);
   }
-  function context(){const p=getActor()?.group.position;const near=type=>p&&points.some(q=>q.type===type&&Math.hypot(p.x-q.x,p.z-q.z)<5);return {camp:near('camp')||layer==='roof'||(s().vessel==='raft'&&s().fleet.raft?.modules>=2),dock:near('dock'),roof:layer==='roof',trader:near('dock')&&s().clock%180<90,district:getDistrict(),tunnel:layer==='tunnel'};}
+  function context(){const p=getActor()?.group.position;const near=type=>layer!=='roof'&&layer!=='tunnel'&&p&&points.some(q=>q.type===type&&Math.hypot(p.x-q.x,p.z-q.z)<5);return {camp:near('camp')||layer==='roof'||(layer!=='tunnel'&&s().vessel==='raft'&&s().fleet.raft?.modules>=2),dock:near('dock'),roof:layer==='roof',trader:near('dock')&&s().clock%180<90,district:getDistrict(),tunnel:layer==='tunnel'};}
   function feedback(message){toast(message);save();feedbackUntil=s().clock+1;}
   function distance(p){const a=getActor()?.group.position;return a?Math.hypot(a.x-p.x,a.z-p.z):Infinity;}
-  function nearest(){return points.filter(p=>distance(p)<3&&(p.type!=='contract'||p.stage===s().contracts[getDistrict()].stage)).sort((a,b)=>distance(a)-distance(b))[0];}
+  function nearest(){if(layer==='roof'||layer==='tunnel')return null;return points.filter(p=>distance(p)<3&&(p.type!=='contract'||p.stage===s().contracts[getDistrict()].stage)).sort((a,b)=>distance(a)-distance(b))[0];}
   function button(label,action,disabled=false){return `<button class="secondary" data-flood="${action}" ${disabled?'disabled':''}>${label}</button>`;}
   const cost=c=>Object.entries(c).map(([k,v])=>`${v} ${k}`).join(' · ');
   function show(tab='field'){
-    if(!getState().flood)return;if(!canUse()){toast('Expanded survival systems are solo-only; leave co-op to use the field console.');return;}
+    if(!getActor()||getState().hp<=0||!getState().flood)return;if(!canUse()){toast('Expanded survival systems are solo-only; leave co-op to use the field console.');return;}
     const f=s(),ctx=context();point=nearest();let body='';
     if(tab==='field')body=`<p class="panel-intro">Approach marked sites and press E. Camp and docks are south; high-value salvage lies north. The simulation pauses while this console is open.</p><div class="flood-actions">${point?button(point.title||names[point.type],`site:${point.type}`):'<p>No site in reach. Move toward amber markers.</p>'}${layer!=='street'?button('Return to street / surface','surface'):''}${layer==='roof'?button(`Climb next floor (${floor}/3)`,'climb'):''}${button('Drink clean water','drink')}${button('Collect floodwater','collect')}${button('Drink stagnant water (unsafe)','stagnant')}${button('Filter + boil water','purify')}${button('Treat illness','heal')}${button('Share rations / dry at camp','rest')}</div><h3>Waterborne illness & exposure</h3><p>Hydration ${Math.ceil(f.hydration)} · illness ${Math.ceil(f.illness)} · wetness ${Math.ceil(f.wetness)}% · ${f.temperature.toFixed(1)}°C · oxygen ${Math.ceil(f.oxygen)}%</p><p>Storm: ${['Gulf haze','Torrential rain','Hurricane storm surge'][f.weather]} · flood ${f.level.toFixed(2)}m · next phase ${Math.ceil((f.clock%240<100?100:f.clock%240<170?170:240)-f.clock%240)}s. Flashlight: T. Mask protects mold zones. Poncho limits exposure.</p><h3>Field log</h3>${f.log.map(t=>`<p>◇ ${escape(t)}</p>`).join('')}`;
     if(tab==='craft')body=`<p>Build camp stations on high ground. Tools and protective gear can be crafted anywhere.</p>${Object.entries(recipes).map(([id,r])=>`<div class="entry"><div><h3>${r.name} ${r.kind?`· ${f.stations[id]}/5`:f.gear[id]?'· equipped':''}</h3><p>${cost(r.cost)}</p></div>${button('Construct',`craft:${id}`,r.kind?f.stations[id]>=5:f.gear[id])}</div>`).join('')}`;
@@ -57,31 +57,31 @@ export function createExpedition({scene,getState,getDistrict,getActor,getStamina
     if(['wire','chemical','brush'].includes(type))return 'Hazard: keep your distance. Protective gear reduces exposure.';
     if(type==='camp'){layer='camp';return 'High-ground camp reached. Construct stations in Craft; assign survivors in Camp.';}
     if(type==='dock'){show('boats');return null;}
-    if(type==='roof'){if(!f.gear.flashlight)return 'Craft a waterproof flashlight for the dark stairwells.';if(getStamina()<30)return 'Need 30 stamina to climb.';setStamina(getStamina()-30);layer='roof';floor=1;roofOrigin={x:p.x,z:p.z};loot(f,p.id+'floor1','attic',day);return 'Climbed to floor 1: rare attic salvage recovered. Climb higher for reconnaissance and relay repairs.';}
-    if(type==='tunnel'){if(!f.gear.flashlight)return 'Craft a waterproof flashlight before entering the storm drains.';getActor().group.position.set(0,-2,Math.min(35,p.z));layer='tunnel';return 'Entered the submerged transit bypass. Watch oxygen; Surface in the console to escape.';}
+    if(type==='roof'){if(f.vessel)return 'Moor your vessel before climbing.';if(!f.gear.flashlight)return 'Craft a waterproof flashlight for the dark stairwells.';if(getStamina()<30)return 'Need 30 stamina to climb.';setStamina(getStamina()-30);layer='roof';floor=1;roofOrigin={x:p.x,z:p.z};loot(f,p.id+'floor1','attic',day);return 'Climbed to floor 1: rare attic salvage recovered. Climb higher for reconnaissance and relay repairs.';}
+    if(type==='tunnel'){if(f.vessel)return 'Moor your vessel before entering the transit.';if(!f.gear.flashlight)return 'Craft a waterproof flashlight before entering the storm drains.';getActor().group.position.set(0,-2,Math.min(35,p.z));layer='tunnel';return 'Entered the submerged transit bypass. Watch oxygen; Surface in the console to escape.';}
     if(type==='survivor')return recruit(f,p.id,day);
     if(type==='car'&&!f.gear.crowbar)return 'Craft a crowbar to salvage rubber, copper and sheet metal.';
     if(type==='wreck'&&!f.gear.axe&&!f.gear.hammer)return 'Craft an axe or sledgehammer to deconstruct wreckage.';
     if(type==='debris'&&!f.gear.hook&&!f.gear.net)return 'A grappling hook or boat net is required.';
     if(type==='drop'&&!f.relays.includes(getDistrict()))return 'Restore the landmark relay to reveal this supply drop.';
-    if(type==='looter'){if(!f.gear.weapon)return 'Territorial looters: craft a makeshift spear before contesting their cache.';hurt(12);return loot(f,p.id,'drop',day);}
-    if(type==='zoo'){hurt(f.gear.weapon?8:25);return loot(f,p.id,'zoo',day);}
+    if(type==='looter'){if(!f.gear.weapon)return 'Territorial looters: craft a makeshift spear before contesting their cache.';hurt(12);if(getState().hp<=0)return 'Rescue beacon required.';return loot(f,p.id,'drop',day);}
+    if(type==='zoo'){hurt(f.gear.weapon?8:25);if(getState().hp<=0)return 'Rescue beacon required.';return loot(f,p.id,'zoo',day);}
     return loot(f,p.id,type,day);
   }
-  function act(id){if(!canUse())return;const f=s(),[kind,arg]=id.split(':'),ctx=context();let result;
+  function act(id){if(!canUse()||!getActor()||getState().hp<=0)return;const f=s(),[kind,arg]=id.split(':'),ctx=context();let result;
     if(kind==='craft')result=craftFlood(f,arg,ctx.camp);
     else if(kind==='boat')result=buildBoat(f,arg,ctx.dock);
-    else if(kind==='board'){if(!ctx.dock)result='Reach the mooring pier first.';else {f.vessel=f.vessel===arg?null:arg;f.anchored=false;result=f.vessel?'Boarded. WASD steers; fuel and hull are shown in Boats.':'Vessel moored safely.';}}
+    else if(kind==='board'){if(!Object.hasOwn(boats,arg)||!f.fleet[arg])result='Build that vessel before boarding.';else if(!ctx.dock)result='Reach the mooring pier first.';else {f.vessel=f.vessel===arg?null:arg;f.anchored=false;result=f.vessel?'Boarded. WASD steers; fuel and hull are shown in Boats.':'Vessel moored safely.';}}
     else if(kind==='site'){result=site(arg);if(!result)return;}
     else if(kind==='surface'){if(layer==='tunnel'){const a=getActor().group;const exitZ=a.position.z<0?-40:27;const exit=points.find(p=>p.type==='tunnel');a.position.set(exit?.x||0,0,exitZ);}else if(roofOrigin)getActor().group.position.set(roofOrigin.x,0,roofOrigin.z+2);layer='street';roofOrigin=null;result='Returned to street level.';}
-    else if(kind==='climb'){if(layer!=='roof'||floor>=3)result='No higher safe floor.';else if(getStamina()<30)result='Need 30 stamina for the next flight.';else{setStamina(getStamina()-30);floor++;if(floor===3)hurt(8);result=loot(f,`${getDistrict()}:floor${floor}`,'drop',getState().day);}}
+    else if(kind==='climb'){if(layer!=='roof'||floor>=3)result='No higher safe floor.';else if(getStamina()<30)result='Need 30 stamina for the next flight.';else{setStamina(getStamina()-30);floor++;if(floor===3)hurt(8);if(getState().hp<=0){onDeath();return;}result=loot(f,`${getDistrict()}:floor${floor}`,'drop',getState().day);}}
     else if(kind==='save'){if(save())toast('Progress secured locally.');return;}
     else if(kind==='close'){closeModal();return;}
     else if(kind==='route'){if(!ctx.dock||!f.vessel||!f.relays.length){result='Moor a vessel and restore a landmark relay first.';}else {return {travel:+arg};}}
     else result=actionFlood(f,id,ctx);
-    feedback(result);show(kind==='craft'?'craft':['boat','board'].includes(kind)?'boats':'field');
+    if(getState().hp<=0){onDeath();return;}if(!canUse())return;feedback(result);show(kind==='craft'?'craft':['boat','board'].includes(kind)?'boats':'field');
   }
-  function resetLayer(){layer='street';floor=1;roofOrigin=null;}
+  function resetLayer(){const actor=getActor()?.group;if(actor){if(layer==='roof'&&roofOrigin)actor.position.set(roofOrigin.x,0,roofOrigin.z+2);else if(layer==='tunnel'){const exit=points.find(p=>p.type==='tunnel');actor.position.set(exit?.x||0,0,actor.position.z<0?-40:27);}}layer='street';floor=1;roofOrigin=null;}
   function elevation(){const f=s();if(!f||!canUse())return getDistrict()===3?.26:0;const p=getActor()?.group.position;if(layer==='roof')return floor*6+.2;if(layer==='tunnel')return -2;if(f.vessel)return f.level+.5;const onDeck=p&&Math.abs(p.x)<5.3&&Math.abs(p.z-43)<4.5;return onDeck?2.15:Math.max(getDistrict()===3?.26:0,f.level-.9);}
   function releaseModel(model){model.traverse(o=>{if(o.geometry){o.geometry.dispose();geometries.delete(o.geometry);}if(o.material?.map){o.material.map.dispose();o.material.dispose();owned.delete(o.material);}});model.removeFromParent();}
   function refreshStructures(){const f=s();const signature=JSON.stringify(f.stations);if(signature!==stationSignature){stationSignature=signature;for(const group of [stationRoot,roofStations])for(const c of [...group.children])releaseModel(c);Object.entries(f.stations).filter(([,level])=>level>0).forEach(([id,level],n)=>{models.station(stationRoot,id,n%2?3.6:-3.6,-3.4+Math.floor(n/2)*1.4,level);const roofModel=models.station(roofStations,id,n%2?1.8:-1.8,-2+Math.floor(n/2)*.9,level);roofModel.scale.setScalar(.65);roofModel.position.y=2.15;});}
@@ -93,16 +93,16 @@ export function createExpedition({scene,getState,getDistrict,getActor,getStamina
       const depth=layer==='tunnel'?Math.abs(p.z+5)<9?2:1.2:layer==='street'?f.level:0;
       const before=f.log[0];const result=tickFlood(f,dt,{...ctx,depth,day:getState().day,indoor:layer==='roof'&&!flashlight,exposed:layer==='street',moving:Math.abs(a.userData.speed||0)>.1,swimming:depth>1.3&&!f.vessel});
       // Fractional environmental damage must not be lost to the combat invulnerability gate.
-      getState().hp=Math.max(0,getState().hp-result.damage);setStamina(Math.max(0,getStamina()-result.staminaDrain));
+      getState().hp=Math.max(0,getState().hp-result.damage);if(getState().hp<=0){onDeath();return;}setStamina(Math.max(0,getStamina()-result.staminaDrain));
       if(f.vessel&&!f.anchored){move(a,dt*result.current*.35,dt*result.current);}
       else if(layer==='street'&&depth>1&&!f.vessel)move(a,dt*result.current*.2,dt*result.current*.45);
       hitCooldown-=dt;
-      const hazard=points.find(q=>['chemical','wire','brush'].includes(q.type)&&distance(q)<2);
+      const hazard=layer==='street'?points.find(q=>['chemical','wire','brush'].includes(q.type)&&distance(q)<2):null;
       if(hazard&&hitCooldown<=0){hurt(hazard.type==='wire'?12:f.gear.poncho?2:5);if(hazard.type==='brush')f.illness=Math.min(100,f.illness+2);hitCooldown=3;toast(names[hazard.type]);}
       if(f.extraction&&Math.floor(f.extraction)%15===0&&f.clock-lastEvent>5){lastEvent=f.clock;hurt(Math.max(1,8-f.stations.barricade*2));toast('Extraction defense: hostile scavengers at the perimeter!');}
       if(layer==='roof'&&getStamina()<5&&hitCooldown<=0){hurt(8);hitCooldown=5;toast('Unstable upper floors: rest before climbing further.');}
       if(f.log[0]!==before)toast(f.log[0]);
-      if(getState().hp<=0)hurt(1);
+      if(getState().hp<=0){onDeath();return;}
     }
     const height=elevation();
     p.y=height;boatMesh.visible=!!f.vessel;boatMesh.position.set(p.x,f.level+.1,p.z);boatMesh.rotation.y=a.rotation.y;
@@ -115,5 +115,5 @@ export function createExpedition({scene,getState,getDistrict,getActor,getStamina
     document.body.classList.toggle('flood-feedback',feedbackUntil>f.clock);return {fog:layer==='tunnel'?.055:f.weather===2?.036:f.weather===1?.022:getState().time>=20?.026:.0095};
   }
   const $=selector=>document.querySelector(selector);
-  return {rebuild,dispose,show,act,update,nearest,elevation,resetLayer,layer:()=>layer,context,capacity,speed:()=>{const f=s();if(!f)return 1;if(f.vessel){const b=f.fleet[f.vessel];return f.anchored||b.hull<=0?0:boats[f.vessel].speed/(3.8*(b.fuel||f.vessel==='raft'?1:4));}return weight(f)>capacity()?.65:1;},collision:()=>{const f=s();if(f?.vessel&&f.clock-collisionAt>1){f.fleet[f.vessel].hull=Math.max(0,f.fleet[f.vessel].hull-2);collisionAt=f.clock;toast('Debris collision · hull damaged');}},interact:()=>{const p=nearest();if(p){show();return true;}return false;}};
+  return {rebuild,dispose,show,act,update,nearest,elevation,resetLayer,layer:()=>layer,context,capacity,speed:()=>{const f=s();if(!f||!canUse())return 1;if(f.vessel){const b=f.fleet[f.vessel];return f.anchored||b.hull<=0?0:boats[f.vessel].speed/(3.8*(b.fuel||f.vessel==='raft'?1:4));}return weight(f)>capacity()?.65:1;},collision:()=>{const f=s();if(f?.vessel&&f.clock-collisionAt>1){f.fleet[f.vessel].hull=Math.max(0,f.fleet[f.vessel].hull-2);collisionAt=f.clock;toast('Debris collision · hull damaged');}},interact:()=>{const p=nearest();if(p){show();return true;}return false;}};
 }
