@@ -43,7 +43,7 @@ export function restoreFlood(saved={}) {
     vessel:boats[s.vessel]&&s.fleet?.[s.vessel]?s.vessel:null,anchored:s.anchored===true,
     hydration:number(s.hydration,100,100),illness:number(s.illness,0,100),wetness:number(s.wetness,0,100),temperature:Number.isFinite(s.temperature)?clamp(s.temperature,32,38):37,oxygen:number(s.oxygen,100,100),morale:number(s.morale,75,100),power:number(s.power,0,100),
     clock:number(s.clock),production:number(s.production),weather:0,level:.15,
-    survivors:Array.isArray(s.survivors)?s.survivors.slice(0,12).map((p,i)=>({id:number(p.id,i),role:roles.includes(p.role)?p.role:'Scout',station:recipes[p.station]?.kind?p.station:null,xp:number(p.xp)})):[],
+    survivors:Array.isArray(s.survivors)?s.survivors.slice(0,12).map((p,i)=>({id:number(p.id,i),name:typeof p.name==='string'?p.name.slice(0,50):'',role:roles.includes(p.role)?p.role:'Scout',station:recipes[p.station]?.kind?p.station:null,xp:number(p.xp)})):[],
     claims:Array.isArray(s.claims)?s.claims.filter(x=>typeof x==='string').slice(-500):[],radio:number(s.radio,0,100),frequency:[88,101,121].includes(s.frequency)?s.frequency:88,distress:s.distress===true,
     relays:Array.isArray(s.relays)?s.relays.filter(x=>Number.isInteger(x)&&x>=0&&x<4):[],relayStage:number(s.relayStage,0,2),extraction:number(s.extraction,0,90),rescued:s.rescued===true,log:Array.isArray(s.log)?s.log.filter(x=>typeof x==='string').slice(0,6):[]};
 }
